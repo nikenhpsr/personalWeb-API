@@ -3,16 +3,23 @@ version: '3.8'
 services:
   web:
     build: .
-    command: gunicorn --bind 0.0.0.0:8000 portofolio.wsgi:application
+    command: sh -c "python manage.py migrate && gunicorn --bind 0.0.0.0:8000 portofolio.wsgi:application"
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
     ports:
       - "8000:8000"
     environment:
-      - DEBUG=0
-      - SECRET_KEY=your_secret_key_here
-      - ALLOWED_HOSTS=localhost,127.0.0.1
+      - .env
+    depends_on:
+      - db
 
+  db:
+    image: postgres:13
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - .env
 volumes:
   static_volume:
+  postgres_data:

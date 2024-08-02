@@ -1,13 +1,18 @@
 import os
 from pathlib import Path
 from datetime import timedelta
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+env_file_path = BASE_DIR / '.env'
+
+env = environ.Env()
+env.read_env(env_file=env_file_path)
 
 # Security settings
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'your-secret-key')
-DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
-# ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',')
+SECRET_KEY = env('DJANGO_SECRET_KEY')
+DEBUG = env('DJANGO_DEBUG')
+# ALLOWED_HOSTS = env('ALLOWED_HOSTS', '').split(',')
 ALLOWED_HOSTS = ['*']  # For testing.
 
 # Application definition
@@ -79,11 +84,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'portofolio.wsgi.application'
 
-# Database configuration
+# Database configuration for PostgreSQL
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': env('POSTGRES_DB'),
+        'USER': env('POSTGRES_USER'),
+        'PASSWORD': env('POSTGRES_PASSWORD'),
+        'HOST': env('POSTGRES_HOST'),
+        'PORT': env('POSTGRES_PORT'),
     }
 }
 
